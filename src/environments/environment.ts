@@ -15,8 +15,8 @@ export const environment = {
     clientId: '1afc31d5-2670-4e0d-b23a-e45a9417cf58',
     authority:
       'https://login.microsoftonline.com/596d0d2f-cf4a-4fd1-8c07-98226aeaeaa5',
-    redirectUri: 'http://localhost:4200',
-    postLogoutRedirectUri: 'http://localhost:4200'
+    redirectUri: window.location.origin,
+    postLogoutRedirectUri: window.location.origin
   },
 
   api: {
