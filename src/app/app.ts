@@ -11,6 +11,8 @@ import {
 
 import { MsalService } from '@azure/msal-angular';
 
+import { environment } from '../environments/environment';
+
 @Component({
   selector: 'app-root',
 
@@ -23,9 +25,6 @@ import { MsalService } from '@azure/msal-angular';
   styleUrl: './app.css'
 })
 export class App implements OnInit {
-
-  readonly scope =
-    'api://46ae7608-cf06-4d26-9cd6-6b0a3e24f1c0/access_as_user';
 
   initialized = signal(false);
   loggedIn = signal(false);
@@ -71,7 +70,7 @@ export class App implements OnInit {
   login(): void {
 
     this.authService.instance.loginRedirect({
-      scopes: [this.scope]
+      scopes: environment.api.scopes
     });
 
   }
@@ -80,7 +79,7 @@ export class App implements OnInit {
 
     this.authService.instance.logoutRedirect({
       postLogoutRedirectUri:
-        'http://localhost:4200'
+        environment.msal.postLogoutRedirectUri
     });
 
   }

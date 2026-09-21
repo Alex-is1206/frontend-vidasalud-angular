@@ -31,55 +31,42 @@ import {
 } from '@azure/msal-angular';
 
 import { routes } from './app.routes';
-
-const API_SCOPE =
-  'api://46ae7608-cf06-4d26-9cd6-6b0a3e24f1c0/access_as_user';
+import { environment } from '../environments/environment';
 
 export function MSALInstanceFactory(): IPublicClientApplication {
-
   return new PublicClientApplication({
     auth: {
-      clientId:
-        '3688fb90-195e-45d4-91ab-1db9c537fbba',
-
-      authority:
-        'https://login.microsoftonline.com/d98821f0-7585-4281-b1ab-9eafbc59c2f5',
-
-      redirectUri:
-        'http://localhost:4200',
-
-      postLogoutRedirectUri:
-        'http://localhost:4200'
+      clientId: environment.msal.clientId,
+      authority: environment.msal.authority,
+      redirectUri: environment.msal.redirectUri,
+      postLogoutRedirectUri: environment.msal.postLogoutRedirectUri
     },
-
     cache: {
-      cacheLocation:
-        BrowserCacheLocation.LocalStorage
+      // sessionStorage: la sesión no sobrevive al cierre de la pestaña
+      cacheLocation: BrowserCacheLocation.SessionStorage
     }
   });
 }
 
-export function MSALGuardConfigFactory():
-  MsalGuardConfiguration {
-
+export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   return {
     interactionType: InteractionType.Redirect,
-
     authRequest: {
-      scopes: [API_SCOPE]
+      scopes: environment.api.scopes
     }
   };
 }
 
-export function MSALInterceptorConfigFactory():
-  MsalInterceptorConfiguration {
-
-  const protectedResourceMap =
-    new Map<string, Array<string>>();
+/**
+ * El interceptor adjunta el Access Token a TODA petición
+ * que vaya a la API. Las demás URLs salen sin token.
+ */
+export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
+  const protectedResourceMap = new Map<string, Array<string>>();
 
   protectedResourceMap.set(
-    'http://localhost:8080/api/secure',
-    [API_SCOPE]
+    `${environment.api.baseUrl}/api/*`,
+    environment.api.scopes
   );
 
   return {
@@ -89,38 +76,27 @@ export function MSALInterceptorConfigFactory():
 }
 
 export const appConfig: ApplicationConfig = {
-
   providers: [
-
     provideBrowserGlobalErrorListeners(),
-
     provideRouter(routes),
-
-    provideHttpClient(
-      withInterceptorsFromDi()
-    ),
-
+    provideHttpClient(withInterceptorsFromDi()),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: MsalInterceptor,
       multi: true
     },
-
     {
       provide: MSAL_INSTANCE,
       useFactory: MSALInstanceFactory
     },
-
     {
       provide: MSAL_GUARD_CONFIG,
       useFactory: MSALGuardConfigFactory
     },
-
     {
       provide: MSAL_INTERCEPTOR_CONFIG,
       useFactory: MSALInterceptorConfigFactory
     },
-
     MsalService,
     MsalGuard,
     MsalBroadcastService
