@@ -20,8 +20,7 @@ export const environment = {
   },
 
   api: {
-    // Por ahora el BFF local; después será la URL del API Gateway
-    baseUrl: 'http://localhost:8080',
+    baseUrl: 'https://cw4eu8c1fi.execute-api.us-east-1.amazonaws.com',
 
     // Los 4 scopes que expone vidasalud-api
     scopes: [
