@@ -1,0 +1,88 @@
+<section class="page-header">
+  <h1>Prestaciones</h1>
+  <p>Catálogo de servicios que ofrece el centro.</p>
+</section>
+
+@if (error()) {
+  <div class="alert alert-error">{{ error() }}</div>
+}
+@if (exito()) {
+  <div class="alert alert-ok">{{ exito() }}</div>
+}
+
+@if (auth.esAdmin()) {
+  <section class="card">
+    <h2>Nueva prestación</h2>
+
+    <form class="form-grid" (ngSubmit)="crear()">
+      <label>
+        Nombre *
+        <input name="nombre" [(ngModel)]="formulario.nombre" required>
+      </label>
+      <label>
+        Descripción
+        <input name="descripcion" [(ngModel)]="formulario.descripcion">
+      </label>
+      <label>
+        Precio (CLP) *
+        <input type="number" name="precio" min="0" [(ngModel)]="formulario.precio" required>
+      </label>
+      <label>
+        Duración (minutos) *
+        <input type="number" name="duracion" min="1" [(ngModel)]="formulario.duracionMinutos" required>
+      </label>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit" [disabled]="enviando()">Crear</button>
+      </div>
+    </form>
+  </section>
+}
+
+<section class="card">
+  <h2>Catálogo</h2>
+
+  @if (cargando()) {
+    <p class="muted">Cargando prestaciones...</p>
+  } @else if (prestaciones().length === 0) {
+    <p class="muted">Aún no hay prestaciones registradas.</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Duración</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            @if (auth.esAdmin()) {
+              <th>Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of prestaciones(); track p.id) {
+            <tr>
+              <td>{{ p.nombre }}</td>
+              <td>{{ p.descripcion || '—' }}</td>
+              <td>{{ p.duracionMinutos }} min</td>
+              <td>{{ p.precio | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+              <td>
+                <span class="badge" [class.badge-confirmada]="p.activo" [class.badge-cancelada]="!p.activo">
+                  {{ p.activo ? 'activa' : 'inactiva' }}
+                </span>
+              </td>
+              @if (auth.esAdmin()) {
+                <td>
+                  <button class="btn btn-small" [disabled]="enviando()" (click)="alternarActivo(p)">
+                    {{ p.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

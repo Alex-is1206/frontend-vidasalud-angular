@@ -1,1 +1,171 @@
-/* You can add global styles to this file, and also import other style files */
+/* VidaSalud: estilos globales */
+
+:root {
+  --bg: #f3f3f3;
+  --surface: #ffffff;
+  --mint: #acdcc9;
+  --mint-soft: #e3f3ec;
+  --mint-dark: #3f8f72;
+  --ink: #262626;
+  --muted: #6b7280;
+  --border: #e2e5e3;
+  --danger: #b3261e;
+  --danger-soft: #fbe9e7;
+  --ok-soft: #e6f4ea;
+  --radius: 12px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+h1, h2 { margin: 0 0 0.4rem; }
+h1 { font-size: 1.9rem; }
+h2 { font-size: 1.15rem; }
+
+/* Barra superior */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 0.8rem 2rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.brand {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+.brand-cross {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--mint);
+  margin-right: 0.3rem;
+}
+.topbar nav { display: flex; gap: 0.3rem; flex: 1; }
+.topbar nav a {
+  padding: 0.45rem 0.8rem;
+  border-radius: 8px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.topbar nav a:hover { background: var(--mint-soft); }
+.topbar nav a.active { background: var(--mint); font-weight: 600; }
+.user { display: flex; align-items: center; gap: 0.5rem; }
+.user-name { font-weight: 600; }
+
+/* Estructura */
+.container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+.page-header { margin-bottom: 1.5rem; }
+.page-header p { color: var(--muted); margin: 0; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.2rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  margin-bottom: 1.2rem;
+}
+.card-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.card-link { color: inherit; text-decoration: none; transition: border-color 0.15s; }
+.card-link:hover { border-color: var(--mint-dark); }
+.card-link p { color: var(--muted); margin: 0; }
+
+.hero { text-align: center; padding: 4rem 1rem; }
+.hero h1 { font-size: 3rem; }
+.hero p { color: var(--muted); font-size: 1.1rem; margin-bottom: 1.8rem; }
+
+/* Botones */
+.btn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn:hover:not(:disabled) { border-color: var(--mint-dark); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+.btn-primary:hover:not(:disabled) { background: #000; }
+.btn-large { padding: 0.8rem 1.6rem; font-size: 1.05rem; }
+.btn-small { padding: 0.3rem 0.65rem; font-size: 0.85rem; text-transform: capitalize; }
+.btn-danger { color: var(--danger); }
+
+/* Formularios */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+label { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; font-weight: 600; }
+label.inline { flex-direction: row; align-items: center; gap: 0.5rem; }
+input, select {
+  font: inherit;
+  font-weight: 400;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+input:focus, select:focus { outline: 2px solid var(--mint); border-color: var(--mint-dark); }
+.form-actions { display: flex; }
+
+/* Tablas */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; margin-top: 0.8rem; }
+th, td { text-align: left; padding: 0.65rem 0.6rem; border-bottom: 1px solid var(--border); }
+th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+td.acciones { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+/* Etiquetas */
+.chip {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  margin: 0.1rem 0.2rem 0.1rem 0;
+  border-radius: 999px;
+  background: var(--mint);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.chip-outline { background: transparent; border: 1px solid var(--mint-dark); color: var(--mint-dark); }
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: #eceff1;
+}
+.badge-solicitada { background: #fff4d6; }
+.badge-confirmada { background: var(--mint-soft); color: var(--mint-dark); }
+.badge-en_espera { background: #e3ecfb; }
+.badge-en_atencion { background: #ede4fb; }
+.badge-cerrada { background: #eceff1; color: var(--muted); }
+.badge-cancelada { background: var(--danger-soft); color: var(--danger); }
+
+/* Mensajes */
+.alert { display: block; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; }
+.alert-error { background: var(--danger-soft); color: var(--danger); }
+.alert-ok { background: var(--ok-soft); color: #1e6b3a; }
+.muted { color: var(--muted); }
+.mono { font-family: Consolas, monospace; font-size: 0.85rem; word-break: break-all; }
+
+dl.datos { display: grid; grid-template-columns: 110px 1fr; gap: 0.5rem 1rem; margin: 1rem 0 0; }
+dl.datos dt { font-weight: 600; color: var(--muted); }
+dl.datos dd { margin: 0; }

@@ -1,0 +1,59 @@
+<section class="page-header">
+  <h1>Mi perfil</h1>
+  <p>El mismo Access Token, leído por el frontend y validado por el BFF.</p>
+</section>
+
+<div class="grid-2">
+  <section class="card">
+    <h2>Leído en el frontend</h2>
+    <p class="muted">Claims del Access Token obtenido por MSAL. Se usan solo para adaptar la interfaz.</p>
+
+    <dl class="datos">
+      <dt>Cuenta</dt>
+      <dd>{{ auth.cuenta()?.username }}</dd>
+      <dt>Roles</dt>
+      <dd>
+        @for (rol of auth.roles(); track rol) {
+          <span class="chip">{{ rol }}</span>
+        } @empty {
+          <span class="muted">sin roles asignados</span>
+        }
+      </dd>
+      <dt>Scopes</dt>
+      <dd>
+        @for (scope of auth.scopes(); track scope) {
+          <span class="chip chip-outline">{{ scope }}</span>
+        }
+      </dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2>Validado por el BFF</h2>
+      <button class="btn btn-small" [disabled]="cargando()" (click)="consultar()">Actualizar</button>
+    </div>
+    <p class="muted">Respuesta de GET /api/me, después de verificar firma, issuer, audience y vigencia.</p>
+
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    @if (perfil(); as p) {
+      <dl class="datos">
+        <dt>Nombre</dt>
+        <dd>{{ p.name }}</dd>
+        <dt>Usuario</dt>
+        <dd>{{ p.username }}</dd>
+        <dt>Roles</dt>
+        <dd>{{ p.roles.length ? p.roles.join(', ') : 'sin roles asignados' }}</dd>
+        <dt>Issuer</dt>
+        <dd class="mono">{{ p.issuer }}</dd>
+        <dt>Audience</dt>
+        <dd class="mono">{{ p.audience.join(', ') }}</dd>
+        <dt>Expira</dt>
+        <dd>{{ p.expiresAt | date: 'dd-MM-yyyy HH:mm:ss' }}</dd>
+      </dl>
+    }
+  </section>
+</div>

@@ -1,35 +1,32 @@
-<h1>VidaSalud</h1>
+<header class="topbar">
+  <a class="brand" routerLink="/">
+    <span class="brand-cross">+</span> VidaSalud
+  </a>
 
-<p>Frontend Angular + Microsoft Entra ID</p>
+  @if (auth.autenticado()) {
+    <nav>
+      <a routerLink="/atenciones" routerLinkActive="active">Atenciones</a>
+      <a routerLink="/prestaciones" routerLinkActive="active">Prestaciones</a>
+      @if (auth.puedeVerBoxes()) {
+        <a routerLink="/boxes" routerLinkActive="active">Boxes</a>
+      }
+      <a routerLink="/perfil" routerLinkActive="active">Mi perfil</a>
+    </nav>
 
-@if (!initialized()) {
+    <div class="user">
+      <span class="user-name">{{ auth.nombre() }}</span>
+      @for (rol of auth.roles(); track rol) {
+        <span class="chip">{{ rol }}</span>
+      }
+      <button class="btn btn-small" (click)="auth.logout()">Cerrar sesión</button>
+    </div>
+  }
+</header>
 
-  <p>Inicializando autenticación...</p>
-
-}
-
-@if (initialized() && !loggedIn()) {
-
-  <button (click)="login()">
-    Iniciar sesión con Microsoft
-  </button>
-
-}
-
-@if (initialized() && loggedIn()) {
-
-  <p>Sesión iniciada correctamente ✅</p>
-
-  <button routerLink="/secure">
-    Ir a zona protegida
-  </button>
-
-  <button (click)="logout()">
-    Cerrar sesión
-  </button>
-
-}
-
-<hr>
-
-<router-outlet></router-outlet>
+<main class="container">
+  @if (!auth.inicializado()) {
+    <p class="muted">Inicializando sesión...</p>
+  } @else {
+    <router-outlet />
+  }
+</main>

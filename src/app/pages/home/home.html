@@ -1,0 +1,52 @@
+@if (!auth.autenticado()) {
+  <section class="hero">
+    <h1>VidaSalud</h1>
+    <p>Agenda y gestiona tus atenciones en la red de centros de salud.</p>
+    <button class="btn btn-primary btn-large" (click)="auth.login()">
+      Iniciar sesión con Microsoft
+    </button>
+  </section>
+} @else {
+  <section class="page-header">
+    <h1>Hola, {{ auth.nombre() }}</h1>
+    <p>
+      @for (rol of auth.roles(); track rol) {
+        <span class="chip">{{ rol }}</span>
+      } @empty {
+        <span class="alert alert-error">Tu cuenta no tiene un rol asignado. Pide a un administrador que te asigne uno.</span>
+      }
+    </p>
+  </section>
+
+  <div class="grid-3">
+    @if (auth.roles().length) {
+      <a class="card card-link" routerLink="/atenciones">
+        <h2>Atenciones</h2>
+        @if (auth.esPersonal()) {
+          <p>Agenda, confirma y da seguimiento a las atenciones del centro.</p>
+        } @else if (auth.tieneRol('Auditor')) {
+          <p>Consulta todas las atenciones del centro.</p>
+        } @else {
+          <p>Agenda una hora y revisa el estado de tus atenciones.</p>
+        }
+      </a>
+
+      <a class="card card-link" routerLink="/prestaciones">
+        <h2>Prestaciones</h2>
+        <p>Catálogo de servicios, duración y precios.</p>
+      </a>
+    }
+
+    @if (auth.puedeVerBoxes()) {
+      <a class="card card-link" routerLink="/boxes">
+        <h2>Boxes</h2>
+        <p>Espacios clínicos disponibles en el centro.</p>
+      </a>
+    }
+
+    <a class="card card-link" routerLink="/perfil">
+      <h2>Mi perfil</h2>
+      <p>Tu identidad, roles y permisos según el token.</p>
+    </a>
+  </div>
+}

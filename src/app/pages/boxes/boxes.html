@@ -1,0 +1,76 @@
+<section class="page-header">
+  <h1>Boxes clínicos</h1>
+  <p>Espacios de atención del centro. Vista exclusiva del personal.</p>
+</section>
+
+@if (error()) {
+  <div class="alert alert-error">{{ error() }}</div>
+}
+@if (exito()) {
+  <div class="alert alert-ok">{{ exito() }}</div>
+}
+
+@if (auth.esAdmin()) {
+  <section class="card">
+    <h2>Nuevo box</h2>
+
+    <form class="form-grid" (ngSubmit)="crear()">
+      <label>
+        Nombre *
+        <input name="nombre" [(ngModel)]="formulario.nombre" required>
+      </label>
+      <label>
+        Capacidad *
+        <input type="number" name="capacidad" min="1" [(ngModel)]="formulario.capacidad" required>
+      </label>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit" [disabled]="enviando()">Crear</button>
+      </div>
+    </form>
+  </section>
+}
+
+<section class="card">
+  <h2>Listado</h2>
+
+  @if (cargando()) {
+    <p class="muted">Cargando boxes...</p>
+  } @else if (boxes().length === 0) {
+    <p class="muted">Aún no hay boxes registrados.</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Capacidad</th>
+            <th>Estado</th>
+            @if (auth.esAdmin()) {
+              <th>Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (b of boxes(); track b.id) {
+            <tr>
+              <td>{{ b.nombre }}</td>
+              <td>{{ b.capacidad }}</td>
+              <td>
+                <span class="badge" [class.badge-confirmada]="b.activo" [class.badge-cancelada]="!b.activo">
+                  {{ b.activo ? 'activo' : 'inactivo' }}
+                </span>
+              </td>
+              @if (auth.esAdmin()) {
+                <td>
+                  <button class="btn btn-small" [disabled]="enviando()" (click)="alternarActivo(b)">
+                    {{ b.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

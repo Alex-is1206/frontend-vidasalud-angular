@@ -1,0 +1,132 @@
+<section class="page-header">
+  <h1>Atenciones</h1>
+  @if (auth.esPersonal() || auth.tieneRol('Auditor')) {
+    <p>Todas las atenciones del centro.</p>
+  } @else {
+    <p>Tus atenciones agendadas.</p>
+  }
+</section>
+
+@if (error()) {
+  <div class="alert alert-error">{{ error() }}</div>
+}
+@if (exito()) {
+  <div class="alert alert-ok">{{ exito() }}</div>
+}
+
+@if (auth.puedeAgendar()) {
+  <section class="card">
+    <h2>Agendar atención</h2>
+
+    <form class="form-grid" (ngSubmit)="agendar()">
+      @if (auth.esPersonal()) {
+        <label>
+          Email del paciente *
+          <input type="email" name="pacienteEmail" [(ngModel)]="formulario.pacienteEmail"
+                 placeholder="paciente@dominio.com" required>
+        </label>
+      }
+
+      <label>
+        Prestación *
+        <select name="prestacionId" [(ngModel)]="formulario.prestacionId" required>
+          <option [ngValue]="null" disabled>Selecciona una prestación</option>
+          @for (p of prestacionesActivas(); track p.id) {
+            <option [ngValue]="p.id">{{ p.nombre }} ({{ p.duracionMinutos }} min)</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Fecha y hora *
+        <input type="datetime-local" name="fechaHora" [(ngModel)]="formulario.fechaHora" required>
+      </label>
+
+      @if (auth.esPersonal()) {
+        <label>
+          Box
+          <select name="boxId" [(ngModel)]="formulario.boxId">
+            <option [ngValue]="null">Sin asignar</option>
+            @for (b of boxesActivos(); track b.id) {
+              <option [ngValue]="b.id">{{ b.nombre }}</option>
+            }
+          </select>
+        </label>
+      }
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit" [disabled]="enviando()">
+          Agendar
+        </button>
+      </div>
+    </form>
+  </section>
+}
+
+<section class="card">
+  <div class="card-header">
+    <h2>Listado</h2>
+
+    <label class="inline">
+      Estado
+      <select name="filtroEstado" [(ngModel)]="filtroEstado" (ngModelChange)="cargar()">
+        <option value="">Todos</option>
+        @for (e of estados; track e) {
+          <option [value]="e">{{ etiqueta(e) }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (cargando()) {
+    <p class="muted">Cargando atenciones...</p>
+  } @else if (atenciones().length === 0) {
+    <p class="muted">No hay atenciones para mostrar.</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Prestación</th>
+            @if (auth.esPersonal() || auth.tieneRol('Auditor')) {
+              <th>Paciente</th>
+              <th>Box</th>
+            }
+            <th>Estado</th>
+            @if (auth.esPersonal()) {
+              <th>Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of atenciones(); track a.id) {
+            <tr>
+              <td>{{ a.id }}</td>
+              <td>{{ a.fechaHora | date: 'dd-MM-yyyy HH:mm' }}</td>
+              <td>{{ nombrePrestacion(a.prestacionId) }}</td>
+              @if (auth.esPersonal() || auth.tieneRol('Auditor')) {
+                <td>{{ a.pacienteEmail }}</td>
+                <td>{{ nombreBox(a.boxId) }}</td>
+              }
+              <td><span class="badge badge-{{ a.estado.toLowerCase() }}">{{ etiqueta(a.estado) }}</span></td>
+              @if (auth.esPersonal()) {
+                <td class="acciones">
+                  @for (siguiente of siguientesEstados(a.estado); track siguiente) {
+                    <button class="btn btn-small" [class.btn-danger]="siguiente === 'CANCELADA'"
+                            [disabled]="enviando()" (click)="cambiarEstado(a, siguiente)">
+                      {{ etiqueta(siguiente) }}
+                    </button>
+                  } @empty {
+                    <span class="muted">Finalizada</span>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
