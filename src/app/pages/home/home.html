@@ -44,6 +44,13 @@
       </a>
     }
 
+    @if (auth.puedeVerAnalitica()) {
+      <a class="card card-link" routerLink="/analitica">
+        <h2>Analítica</h2>
+        <p>Indicadores en tiempo real del centro, alimentados por Kafka.</p>
+      </a>
+    }
+
     <a class="card card-link" routerLink="/perfil">
       <h2>Mi perfil</h2>
       <p>Tu identidad, roles y permisos según el token.</p>

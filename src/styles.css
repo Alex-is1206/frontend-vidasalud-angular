@@ -169,3 +169,49 @@ td.acciones { display: flex; gap: 0.35rem; flex-wrap: wrap; }
 dl.datos { display: grid; grid-template-columns: 110px 1fr; gap: 0.5rem 1rem; margin: 1rem 0 0; }
 dl.datos dt { font-weight: 600; color: var(--muted); }
 dl.datos dd { margin: 0; }
+
+/* Analítica en tiempo real */
+.analitica-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+.en-vivo { display: flex; align-items: center; gap: 0.6rem; font-weight: 600; }
+.punto {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--mint-dark);
+  animation: latido 1.6s ease-in-out infinite;
+}
+.punto.pausado { background: var(--muted); animation: none; }
+@keyframes latido {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(63, 143, 114, 0.45); }
+  50% { box-shadow: 0 0 0 0.45rem rgba(63, 143, 114, 0); }
+}
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 1.2rem; }
+.kpi { display: flex; flex-direction: column; gap: 0.2rem; margin-bottom: 0; }
+.kpi-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); font-weight: 600; }
+.kpi-valor { font-size: 2.4rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.kpi-valor small { font-size: 1.1rem; color: var(--muted); font-weight: 600; }
+.kpi-nota { font-size: 0.85rem; color: var(--muted); }
+
+.barras { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 0.8rem; }
+.barra-fila { display: grid; grid-template-columns: 7.5rem 1fr 2.5rem; align-items: center; gap: 0.7rem; border-radius: 8px; }
+.barra { height: 0.7rem; background: #eceff1; border-radius: 999px; overflow: hidden; }
+.barra-relleno { height: 100%; background: var(--mint-dark); border-radius: 999px; transition: width 0.6s ease; }
+.barra-kafka { background: var(--ink); }
+.barra-valor { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.ultimo { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--border); border-radius: 8px; }
+.ultimo p { margin: 0.35rem 0 0; }
+.historial-error { margin-top: 1rem; }
+
+/* Resaltado breve de lo que cambió en la última actualización */
+.flash { animation: destello 1.5s ease-out; }
+@keyframes destello {
+  0% { background-color: var(--mint); }
+  100% { background-color: transparent; }
+}
+.card.flash { animation: destello-card 1.5s ease-out; }
+@keyframes destello-card {
+  0% { background-color: var(--mint-soft); border-color: var(--mint-dark); }
+  100% { background-color: var(--surface); border-color: var(--border); }
+}
