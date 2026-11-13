@@ -1,0 +1,143 @@
+<section class="page-header analitica-header">
+  <div>
+    <h1>Analítica en tiempo real</h1>
+    <p>Indicadores calculados a partir de los eventos de Kafka. Se actualizan cada {{ intervaloSegundos }} segundos.</p>
+  </div>
+  <div class="en-vivo">
+    <span class="punto" [class.pausado]="!enVivo()"></span>
+    <span>
+      {{ enVivo() ? 'En vivo' : 'En pausa' }}
+      @if (ultimaActualizacion(); as hora) {
+        <span class="muted">· {{ hora | date: 'HH:mm:ss' }}</span>
+      }
+    </span>
+    <button class="btn btn-small" (click)="alternarEnVivo()">{{ enVivo() ? 'Pausar' : 'Reanudar' }}</button>
+  </div>
+</section>
+
+@if (error()) {
+  <div class="alert alert-error">{{ error() }}</div>
+}
+
+@if (resumen(); as r) {
+  <!-- Indicadores principales -->
+  <div class="kpis">
+    <div class="card kpi" [class.flash]="cambio('total')">
+      <span class="kpi-label">Atenciones</span>
+      <span class="kpi-valor">{{ r.totalAtenciones }}</span>
+      <span class="kpi-nota">distintas registradas</span>
+    </div>
+    <div class="card kpi" [class.flash]="cambio('minuto')">
+      <span class="kpi-label">Confirmadas · último minuto</span>
+      <span class="kpi-valor">{{ r.confirmacionesUltimoMinuto }}</span>
+      <span class="kpi-nota">{{ r.confirmacionesUltimaHora }} en la última hora</span>
+    </div>
+    <div class="card kpi" [class.flash]="cambio('boxes')">
+      <span class="kpi-label">Boxes activos</span>
+      <span class="kpi-valor">{{ r.boxesActivos }}<small> / {{ r.boxesTotales }}</small></span>
+      <span class="kpi-nota">capacidad activa {{ r.capacidadActiva }}</span>
+    </div>
+    <div class="card kpi" [class.flash]="cambio('eventos')">
+      <span class="kpi-label">Eventos procesados</span>
+      <span class="kpi-valor">{{ r.eventosProcesados }}</span>
+      <span class="kpi-nota">{{ r.duplicadosIgnorados }} duplicados ignorados</span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Distribución por estado -->
+    <section class="card">
+      <h2>Atenciones por estado</h2>
+      <div class="barras">
+        @for (fila of porEstado(); track fila.estado) {
+          <div class="barra-fila" [class.flash]="cambio(fila.estado)">
+            <span class="badge badge-{{ fila.estado.toLowerCase() }}">{{ fila.estado.toLowerCase().replace('_', ' ') }}</span>
+            <div class="barra"><div class="barra-relleno" [style.width.%]="fila.ancho"></div></div>
+            <span class="barra-valor">{{ fila.cantidad }}</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Cómo trabaja Kafka por debajo -->
+    <section class="card">
+      <h2>Reparto entre particiones</h2>
+      <p class="muted">Tópico <span class="mono">vidasalud.atenciones.eventos</span>, clave = id de la atención. Cada partición la procesa un hilo distinto del grupo <span class="mono">vidasalud-analitica</span>.</p>
+      <div class="barras">
+        @for (p of porParticion(); track p.particion) {
+          <div class="barra-fila">
+            <span class="chip chip-outline">partición {{ p.particion }}</span>
+            <div class="barra"><div class="barra-relleno barra-kafka" [style.width.%]="p.ancho"></div></div>
+            <span class="barra-valor">{{ p.cantidad }}</span>
+          </div>
+        }
+      </div>
+
+      @if (r.ultimoEvento; as e) {
+        <div class="ultimo" [class.flash]="cambio('ultimo')">
+          <span class="kpi-label">Último evento</span>
+          <p>
+            Atención <strong>#{{ e.atencionId }}</strong>:
+            @if (e.estadoAnterior) {
+              <span class="badge badge-{{ e.estadoAnterior.toLowerCase() }}">{{ e.estadoAnterior.toLowerCase().replace('_', ' ') }}</span> →
+            }
+            <span class="badge badge-{{ e.estadoNuevo.toLowerCase() }}">{{ e.estadoNuevo.toLowerCase().replace('_', ' ') }}</span>
+          </p>
+          <p class="mono muted">partición {{ e.particion }} · offset {{ e.offset }} · {{ e.hilo }}</p>
+        </div>
+      }
+    </section>
+  </div>
+} @else if (!error()) {
+  <p class="muted">Cargando indicadores...</p>
+}
+
+<!-- Historial de una atención (Oracle) -->
+<section class="card">
+  <h2>Historial de una atención</h2>
+  <p class="muted">Línea de tiempo guardada en Oracle por el grupo <span class="mono">vidasalud-historial</span>.</p>
+
+  <form class="form-grid" (ngSubmit)="buscarHistorial()">
+    <label>
+      N.º de atención
+      <input type="number" name="atencion" min="1" [(ngModel)]="atencionBuscada">
+    </label>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit" [disabled]="buscando()">Ver historial</button>
+    </div>
+  </form>
+
+  @if (errorHistorial()) {
+    <div class="alert alert-error historial-error">{{ errorHistorial() }}</div>
+  }
+
+  @if (historial(); as eventos) {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cuándo</th>
+            <th>Evento</th>
+            <th>Cambio</th>
+            <th>Partición / offset</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (h of eventos; track h.eventId) {
+            <tr>
+              <td>{{ h.ocurridoEn | date: 'dd-MM-yyyy HH:mm:ss' }}</td>
+              <td class="mono">{{ h.tipo }}</td>
+              <td>
+                @if (h.estadoAnterior) {
+                  <span class="badge badge-{{ h.estadoAnterior.toLowerCase() }}">{{ h.estadoAnterior.toLowerCase().replace('_', ' ') }}</span> →
+                }
+                <span class="badge badge-{{ h.estadoNuevo.toLowerCase() }}">{{ h.estadoNuevo.toLowerCase().replace('_', ' ') }}</span>
+              </td>
+              <td class="mono">{{ h.particion }} / {{ h.offset }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

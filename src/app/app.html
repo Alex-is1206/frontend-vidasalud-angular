@@ -10,6 +10,9 @@
       @if (auth.puedeVerBoxes()) {
         <a routerLink="/boxes" routerLinkActive="active">Boxes</a>
       }
+      @if (auth.puedeVerAnalitica()) {
+        <a routerLink="/analitica" routerLinkActive="active">Analítica</a>
+      }
       <a routerLink="/perfil" routerLinkActive="active">Mi perfil</a>
     </nav>
 

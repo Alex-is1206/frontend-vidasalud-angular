@@ -37,6 +37,8 @@ export class AuthService {
   readonly esAdmin = computed(() => this.tieneRol('Admin'));
   readonly puedeAgendar = computed(() => this.tieneRol('Admin', 'Recepcionista', 'Paciente'));
   readonly puedeVerBoxes = computed(() => this.tieneRol('Admin', 'Recepcionista', 'Auditor'));
+  /** Indicadores de gestion en tiempo real (Kafka): solo Admin y Auditor. */
+  readonly puedeVerAnalitica = computed(() => this.tieneRol('Admin', 'Auditor'));
 
   /** Se ejecuta una sola vez, aunque la llamen el componente raíz y los guards. */
   inicializar(): Promise<void> {

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { MsalGuard } from '@azure/msal-angular';
 
 import { roleGuard } from './core/role.guard';
+import { AnaliticaPage } from './pages/analitica/analitica';
 import { AtencionesPage } from './pages/atenciones/atenciones';
 import { BoxesPage } from './pages/boxes/boxes';
 import { HomePage } from './pages/home/home';
@@ -38,6 +39,14 @@ export const routes: Routes = [
     component: BoxesPage,
     canActivate: [MsalGuard, roleGuard('Admin', 'Recepcionista', 'Auditor')],
     title: 'Boxes · VidaSalud'
+  },
+
+  // Panel en tiempo real alimentado por Kafka: solo Admin y Auditor
+  {
+    path: 'analitica',
+    component: AnaliticaPage,
+    canActivate: [MsalGuard, roleGuard('Admin', 'Auditor')],
+    title: 'Analítica · VidaSalud'
   },
 
   { path: 'sin-acceso', component: SinAccesoPage, title: 'Sin acceso · VidaSalud' },

@@ -68,3 +68,50 @@ export const TRANSICIONES: Record<EstadoAtencion, EstadoAtencion[]> = {
 };
 
 export const ESTADOS: EstadoAtencion[] = Object.keys(TRANSICIONES) as EstadoAtencion[];
+
+/* ---------- Analítica en tiempo real (ms-vidasalud-analytics, vía BFF) ---------- */
+
+/** Último evento de atención que procesó el consumidor de Kafka. */
+export interface UltimoEvento {
+  eventId: string;
+  tipo: 'ATENCION_CREADA' | 'ESTADO_CAMBIADO';
+  atencionId: number;
+  estadoAnterior: string | null;
+  estadoNuevo: string;
+  ocurridoEn: string;
+  particion: number;
+  offset: number;
+  hilo: string;
+  procesadoEn: string;
+}
+
+/** Respuesta de GET /api/analitica/resumen. */
+export interface ResumenAnalitica {
+  totalAtenciones: number;
+  atencionesPorEstado: Record<string, number>;
+  confirmacionesUltimoMinuto: number;
+  confirmacionesUltimaHora: number;
+  atencionesPorPrestacion: Record<string, number>;
+  boxesTotales: number;
+  boxesActivos: number;
+  capacidadActiva: number;
+  eventosProcesados: number;
+  duplicadosIgnorados: number;
+  eventosPorParticion: Record<string, number>;
+  ultimoEvento: UltimoEvento | null;
+  generadoEn: string;
+}
+
+/** Un punto de la línea de tiempo de una atención (tabla HISTORIAL_ATENCION). */
+export interface HistorialEntrada {
+  eventId: string;
+  tipo: string;
+  atencionId: number;
+  estadoAnterior: string | null;
+  estadoNuevo: string;
+  boxId: number | null;
+  ocurridoEn: string;
+  procesadoEn: string;
+  particion: number;
+  offset: number;
+}
